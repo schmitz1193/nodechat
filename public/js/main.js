@@ -1,32 +1,70 @@
-'use strict'
+;(function () {
+  'use strict'
 
-const express = require('express')
-const app = express()
-const server = require('http').createServer(app)
-const ws = require('socket.io')(server)
+  const ws = io.connect()
 
-const PORT = process.env.PORT || 3000
-
-app.set('view engine', 'jade')
-
-app.use(express.static('public'))
-
-app.get('/', (req, res) => {
-  res.render('index')
-})
-
-server.listen(PORT, () => {
-  console.log(`Server listening on port: ${PORT}`)
-})
-
-ws.on('connection', socket => {
-  console.log('socket connected')
-
-  socket.on('sendChat', msg => {
-    console.log(msg)
-    socket.broadcast.emit('receiveChat', msg)
+  ws.on('connect', (socket) => {
+    console.log('socket connected')
   })
-})
 
+  ws.on('receiveChat', msgs => {
+    msgs.forEach(displayChat)
+  })
 
+  const form = document.querySelector('form')
+  const name = document.querySelector('input[name="name"]')
+  const text = document.querySelector('input[name="text"]')
+  const ul = document.querySelector('ul')
 
+  form.addEventListener('submit', () => {
+    const chat = {
+      name: name.value,
+      text: text.value
+    }
+
+    ws.emit('sendChat', chat)
+    displayChat(chat)
+    text.value = ''
+    event.preventDefault()
+  })
+
+  function displayChat (chat) {
+    if (!document.querySelector(`[data-id="${chat._id}"]`)) {
+      const li = generateLI(chat)
+
+      ul.appendChild(li)
+    }
+  }
+
+  function generateLI (chat) {
+    const li = document.createElement('li')
+    const textNode = document.createTextNode(`${chat.name}: ${chat.text}`)
+    const dataId = document.createAttribute('data-id')
+
+    dataId.value = chat._id
+
+    li.setAttributeNode(dataId)
+    li.appendChild(textNode)
+
+    return li
+  }
+
+  function getJSON(url, cb) {
+    const request = new XMLHttpRequest()
+
+    request.open('GET', url)
+
+    request.onload = () => {
+      cb(JSON.parse(request.responseText))
+    }
+
+    request.send()
+  }
+
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   getJSON('/chats', chats => {
+  //     chats.forEach(displayChat)
+  //   })
+  // })
+
+}());
