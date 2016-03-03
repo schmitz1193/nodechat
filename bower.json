@@ -1,0 +1,18 @@
+{
+  "name": "nodechat",
+  "description": "",
+  "main": "server.js",
+  "authors": [
+    "Stephanie Krause <schmitz1193@github.io>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/schmitz1193/nodechat",
+  "moduleType": [],
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
